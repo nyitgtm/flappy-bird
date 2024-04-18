@@ -52,16 +52,16 @@ window.onload = function() {
 
     //load images
     birdImg = new Image();
-    birdImg.src = "./flappybird.png";
+    birdImg.src = "Assets/flappybird.png";
     birdImg.onload = function() {
         context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
     }
 
     topPipeImg = new Image();
-    topPipeImg.src = "./toppipe.png";
+    topPipeImg.src = "Assets/toppipe.png";
 
     bottomPipeImg = new Image();
-    bottomPipeImg.src = "./bottompipe.png";
+    bottomPipeImg.src = "Assets/bottompipe.png";
 
     requestAnimationFrame(update);
     setInterval(placePipes, pipeTimes); //every 1.5 seconds
@@ -196,10 +196,8 @@ function moveBird(e) {
         //reset game
         if (gameOver) {
             bird.y = birdY;
-            pipeArray = [];
             score = 0;
             gameOver = false;
-            pipeArray = [];
             velocityX = -5;
             velocityY = 0;
             gravity = 0.5;
