@@ -11,6 +11,7 @@ let birdX = boardWidth/7;
 let birdY = boardHeight/2;
 let birdImg;
 let canFly = false;
+let inIdleState = true;
 
 let bird = {
     x : birdX,
@@ -130,7 +131,7 @@ function update() {
         pipeArray.shift(); //removes first element from the array
     }
 
-    if(canFly) {
+    if(!inIdleState) {
         //score
         context.fillStyle = "white";
         context.font="50px Impact";
@@ -153,7 +154,7 @@ function update() {
 }
 
 function placePipes() {
-    if (gameOver || !canFly) {
+    if (gameOver || !canFly || inIdleState) {
         pipeArray = [];
         return;
     }
@@ -203,15 +204,18 @@ function moveBird(e) {
             velocityY = 0;
             gravity = 0.5;
             pipeTimes = 2000;
+            inIdleState = true;
         }
         else {
             canFly = true;
+            inIdleState = false;
         }
     }
 }
 
 function idleStateSim() {
     //make the bird hover
+    inIdleState = true;
     let random = 1 + Math.random()*1.5;
     if (bird.y >= boardHeight/random) {
         velocityY = -10;
