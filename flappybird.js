@@ -10,6 +10,7 @@ let birdHeight = 24;
 let birdX = boardWidth/7;
 let birdY = boardHeight/2;
 let birdImg;
+let canFly = false;
 
 let bird = {
     x : birdX,
@@ -18,13 +19,14 @@ let bird = {
     height : birdHeight
 }
 
+
 //pipes
 let pipeArray = [];
 let pipeWidth = 64; //width/height ratio = 384/3072 = 1/8
 let pipeHeight = boardHeight;
 let pipeX = boardWidth;
 let pipeY = 0;
-let pipeTimes = 2000; //every 2 seconds
+let pipeTimes = 1000; //every 2 seconds
 
 let topPipeImg;
 let bottomPipeImg;
@@ -80,42 +82,46 @@ function update() {
 
     if (bird.y > board.height) {
         gameOver = true;
+        canFly = false;
     }
 
     //pipes
-    for (let i = 0; i < pipeArray.length; i++) {
-        let pipe = pipeArray[i];
-        pipe.x += velocityX;
-        context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
+    if(canFly) {
+        for (let i = 0; i < pipeArray.length; i++) {
+            let pipe = pipeArray[i];
+            pipe.x += velocityX;
+            context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
 
-        if (!pipe.passed && bird.x > pipe.x + pipe.width) {
-            score += 0.5; //0.5 because there are 2 pipes! so 0.5*2 = 1, 1 for each set of pipes
-            pipe.passed = true;
-        }
+            if (!pipe.passed && bird.x > pipe.x + pipe.width) {
+                score += 0.5; //0.5 because there are 2 pipes! so 0.5*2 = 1, 1 for each set of pipes
+                pipe.passed = true;
+            }
 
-        if (detectCollision(bird, pipe)) {
-            gameOver = true;
-        }
+            if (detectCollision(bird, pipe)) {
+                gameOver = true;
+                canFly = false;
+            }
 
-        if(score == 10) {
-            velocityX = -6;
-        }
-        else if (score == 20) {
-            velocityX = -7;
-            gravity = 0.6;
-        }
-        else if (score == 30) {
-            velocityX = -8;
-            gravity = 0.7;
-        }
-        else if (score == 40) {
-            velocityX = -9;
-            gravity = 0.9;
-        }
-        else if (score == 50) {
-            velocityX = -10;
-            gravity = 1.0;
-            pipeTimes = 5;
+            if(score == 10) {
+                velocityX = -6;
+            }
+            else if (score == 20) {
+                velocityX = -7;
+                gravity = 0.6;
+            }
+            else if (score == 30) {
+                velocityX = -8;
+                gravity = 0.7;
+            }
+            else if (score == 40) {
+                velocityX = -9;
+                gravity = 0.9;
+            }
+            else if (score == 50) {
+                velocityX = -10;
+                gravity = 1.0;
+                pipeTimes = 5;
+            }
         }
     }
 
@@ -124,13 +130,18 @@ function update() {
         pipeArray.shift(); //removes first element from the array
     }
 
-    //score
-    context.fillStyle = "white";
-    context.font="50px Impact";
-    context.lineWidth = 3;
-    context.strokeStyle = "black";
-    context.strokeText(score, boardWidth/2 - 25, 45);
-    context.fillText(score, boardWidth/2 - 25, 45);
+    if(canFly) {
+        //score
+        context.fillStyle = "white";
+        context.font="50px Impact";
+        context.lineWidth = 3;
+        context.strokeStyle = "black";
+        context.strokeText(score, boardWidth/2 - 25, 45);
+        context.fillText(score, boardWidth/2 - 25, 45);
+    }
+    else {
+        idleStateSim();
+    }
 
     if (gameOver) {
         context.lineWidth = 4; // increase the outline width
@@ -138,10 +149,12 @@ function update() {
         context.strokeText("GAME OVER", boardWidth/2 - 120, 100);
         context.fillText("GAME OVER", boardWidth/2 - 120, 100);
     }
+    
 }
 
 function placePipes() {
-    if (gameOver) {
+    if (gameOver || !canFly) {
+        pipeArray = [];
         return;
     }
 
@@ -170,12 +183,14 @@ function placePipes() {
         passed : false
     }
     pipeArray.push(bottomPipe);
+
+    console.log(pipeArray);
 }
 
 function moveBird(e) {
     if (e.code == "Space" || e.code == "ArrowUp" || e.code == "KeyX") {
         //jump
-        velocityY = -8;
+        velocityY = -10;
 
         //reset game
         if (gameOver) {
@@ -189,7 +204,24 @@ function moveBird(e) {
             gravity = 0.5;
             pipeTimes = 2000;
         }
+        else {
+            canFly = true;
+        }
     }
+}
+
+function idleStateSim() {
+    //make the bird hover
+    let random = 1 + Math.random()*1.5;
+    if (bird.y >= boardHeight/random) {
+        velocityY = -10;
+    }
+    context.fillStyle = "white";
+    context.font="50px Impact";
+    context.lineWidth = 3;
+    context.strokeStyle = "black";
+    context.strokeText("Press Space to Start", boardWidth/2 - 250, 100);
+    context.fillText("Press Space to Start", boardWidth/2 - 250, 100);
 }
 
 function detectCollision(a, b) {
