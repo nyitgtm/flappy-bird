@@ -1,13 +1,13 @@
 //board
 let board;
-let boardWidth = 360;
-let boardHeight = 640;
+let boardWidth = window.innerWidth;
+let boardHeight = window.innerHeight;
 let context;
 
 //bird
 let birdWidth = 34; //width/height ratio = 408/228 = 17/12
 let birdHeight = 24;
-let birdX = boardWidth/8;
+let birdX = boardWidth/7;
 let birdY = boardHeight/2;
 let birdImg;
 
@@ -21,17 +21,18 @@ let bird = {
 //pipes
 let pipeArray = [];
 let pipeWidth = 64; //width/height ratio = 384/3072 = 1/8
-let pipeHeight = 512;
+let pipeHeight = boardHeight;
 let pipeX = boardWidth;
 let pipeY = 0;
+let pipeTimes = 2000; //every 2 seconds
 
 let topPipeImg;
 let bottomPipeImg;
 
 //physics
-let velocityX = -2; //pipes moving left speed
+let velocityX = -5; //pipes moving left speed
 let velocityY = 0; //bird jump speed
-let gravity = 0.4;
+let gravity = 0.5;
 
 let gameOver = false;
 let score = 0;
@@ -60,7 +61,7 @@ window.onload = function() {
     bottomPipeImg.src = "./bottompipe.png";
 
     requestAnimationFrame(update);
-    setInterval(placePipes, 1500); //every 1.5 seconds
+    setInterval(placePipes, pipeTimes); //every 1.5 seconds
     document.addEventListener("keydown", moveBird);
 }
 
@@ -95,6 +96,27 @@ function update() {
         if (detectCollision(bird, pipe)) {
             gameOver = true;
         }
+
+        if(score == 10) {
+            velocityX = -6;
+        }
+        else if (score == 20) {
+            velocityX = -7;
+            gravity = 0.6;
+        }
+        else if (score == 30) {
+            velocityX = -8;
+            gravity = 0.7;
+        }
+        else if (score == 40) {
+            velocityX = -9;
+            gravity = 0.9;
+        }
+        else if (score == 50) {
+            velocityX = -10;
+            gravity = 1.0;
+            pipeTimes = 5;
+        }
     }
 
     //clear pipes
@@ -104,11 +126,17 @@ function update() {
 
     //score
     context.fillStyle = "white";
-    context.font="45px sans-serif";
-    context.fillText(score, 5, 45);
+    context.font="50px Impact";
+    context.lineWidth = 3;
+    context.strokeStyle = "black";
+    context.strokeText(score, boardWidth/2 - 25, 45);
+    context.fillText(score, boardWidth/2 - 25, 45);
 
     if (gameOver) {
-        context.fillText("GAME OVER", 5, 90);
+        context.lineWidth = 4; // increase the outline width
+        context.strokeStyle = "black";
+        context.strokeText("GAME OVER", boardWidth/2 - 120, 100);
+        context.fillText("GAME OVER", boardWidth/2 - 120, 100);
     }
 }
 
@@ -147,7 +175,7 @@ function placePipes() {
 function moveBird(e) {
     if (e.code == "Space" || e.code == "ArrowUp" || e.code == "KeyX") {
         //jump
-        velocityY = -6;
+        velocityY = -8;
 
         //reset game
         if (gameOver) {
@@ -155,6 +183,11 @@ function moveBird(e) {
             pipeArray = [];
             score = 0;
             gameOver = false;
+            pipeArray = [];
+            velocityX = -5;
+            velocityY = 0;
+            gravity = 0.5;
+            pipeTimes = 2000;
         }
     }
 }
