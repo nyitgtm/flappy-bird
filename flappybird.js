@@ -220,12 +220,15 @@ function idleStateSim() {
     if (bird.y >= boardHeight/random) {
         velocityY = -10;
     }
+
     context.fillStyle = "white";
     context.font="50px Impact";
-    context.lineWidth = 3;
+    context.lineWidth = 5;
     context.strokeStyle = "black";
+    context.globalAlpha = Math.abs(Math.sin(Date.now() / 850)); // pulse in opacity
     context.strokeText("Press Space to Start", boardWidth/2 - 250, 100);
     context.fillText("Press Space to Start", boardWidth/2 - 250, 100);
+    context.globalAlpha = 1; // reset opacity
 }
 
 function detectCollision(a, b) {
