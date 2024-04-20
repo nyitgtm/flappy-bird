@@ -84,11 +84,6 @@ function update() {
     bird.y = Math.max(bird.y + velocityY, 0); //apply gravity to current bird.y, limit the bird.y to top of the canvas
     context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
 
-    if (bird.y > board.height) {
-        gameOver = true;
-        canFly = false;
-    }
-
     //pipes
     if(canFly) {
         for (let i = 0; i < pipeArray.length; i++) {
@@ -360,8 +355,9 @@ document.addEventListener('keydown', function(event) {
 });
 
 function detectCollision(a, b) {
-    return a.x < b.x + b.width &&   //a's top left corner doesn't reach b's top right corner
+    return (a.x < b.x + b.width &&   //a's top left corner doesn't reach b's top right corner
            a.x + a.width > b.x &&   //a's top right corner passes b's top left corner
            a.y < b.y + b.height &&  //a's top left corner doesn't reach b's bottom left corner
-           a.y + a.height > b.y;    //a's bottom left corner passes b's top left corner
+           a.y + a.height > b.y)    //a's bottom left corner passes b's top left corner
+           || bird.y > board.height; //bird hits the ground  
 }
