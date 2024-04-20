@@ -10,7 +10,7 @@ body {
     margin: 0;
     padding: 0;
     /* fix rgb */
-    background-color: rgb(133, 195, 205); 
+    background-color: rgb(113, 197, 207); 
     background-image: url("Assets/flappybirdbg.png");
     background-position: 100% 100%;
     background-repeat: repeat-x;

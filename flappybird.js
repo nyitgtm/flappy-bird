@@ -40,6 +40,9 @@ let gravity = 0.5;
 let gameOver = false;
 let score = 0;
 
+//name
+let name = "!@#"
+
 window.onload = function() {
     board = document.getElementById("board");
     board.height = boardHeight;
@@ -147,8 +150,9 @@ function update() {
     if (gameOver) {
         context.lineWidth = 4; // increase the outline width
         context.strokeStyle = "black";
-        context.strokeText("GAME OVER", boardWidth/2 - 120, 100);
-        context.fillText("GAME OVER", boardWidth/2 - 120, 100);
+        context.strokeText("GAME OVER", boardWidth/2 - 112.5, 100);
+        context.fillText("GAME OVER", boardWidth/2 - 112.5, 100);
+        showLeaderboard();
     }
     
 }
@@ -184,8 +188,6 @@ function placePipes() {
         passed : false
     }
     pipeArray.push(bottomPipe);
-
-    console.log(pipeArray);
 }
 
 function moveBird(e) {
@@ -197,12 +199,12 @@ function moveBird(e) {
         if (gameOver) {
             bird.y = birdY;
             score = 0;
-            gameOver = false;
             velocityX = -5;
             velocityY = 0;
             gravity = 0.5;
             pipeTimes = 2000;
-            inIdleState = true;
+            //gameOver = false;
+            //inIdleState = true;
         }
         else {
             canFly = true;
@@ -224,10 +226,138 @@ function idleStateSim() {
     context.lineWidth = 5;
     context.strokeStyle = "black";
     context.globalAlpha = Math.abs(Math.sin(Date.now() / 850)); // pulse in opacity
-    context.strokeText("Press Space to Start", boardWidth/2 - 250, 100);
-    context.fillText("Press Space to Start", boardWidth/2 - 250, 100);
+    context.strokeText("Press Space to Start", boardWidth/2 - 210, 100);
+    context.fillText("Press Space to Start", boardWidth/2 - 210, 100);
     context.globalAlpha = 1; // reset opacity
 }
+
+function showLeaderboard() {
+    if(name == "!@#") {
+        name = prompt("Enter your name: ").trim();
+        if(name == null) {
+            name = "Anonymous";
+        }
+        else if (name.length == 0) {
+            name = "Anonymous";
+        }
+        else if (name.length > 24) {
+            name = name.substring(0, 19) + " ...";
+        }
+    }
+
+    let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+    leaderboard.push({name: name.substring(0, 24), score: score});
+    leaderboard.sort((a, b) => b.score - a.score); //sort in descending order
+    leaderboard = leaderboard.slice(0, 5); //only top 5 scores
+    localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+
+    //display leaderboard on screen
+    context.fillStyle = "black";
+    context.beginPath();
+    context.moveTo(boardWidth/2 - 200 + 20, 150);
+    context.lineTo(boardWidth/2 + 200 - 20, 150);
+    context.quadraticCurveTo(boardWidth/2 + 200, 150, boardWidth/2 + 200, 150 + 20);
+    context.lineTo(boardWidth/2 + 200, 150 + 350 - 20); 
+    context.quadraticCurveTo(boardWidth/2 + 200, 150 + 350, boardWidth/2 + 200 - 20, 150 + 350);
+    context.lineTo(boardWidth/2 - 200 + 20, 150 + 350); 
+    context.quadraticCurveTo(boardWidth/2 - 200, 150 + 350, boardWidth/2 - 200, 150 + 350 - 20); 
+    context.lineTo(boardWidth/2 - 200, 150 + 20);
+    context.quadraticCurveTo(boardWidth/2 - 200, 150, boardWidth/2 - 200 + 20, 150);
+    context.closePath();
+    context.globalAlpha = 0.8;
+    context.fill();
+    context.globalAlpha = 1; 
+
+    context.fillStyle = "white";
+    context.font="30px Impact";
+    context.lineWidth = 3;
+    context.strokeStyle = "black";
+    context.strokeText("Leaderboard", boardWidth/2 - 80, 200);
+    context.fillText("Leaderboard", boardWidth/2 - 80, 200);
+    for (let i = 0; i < leaderboard.length; i++) {
+        let name = leaderboard[i].name;
+        let score = leaderboard[i].score;
+        let text = name + " : " + score;
+        let textWidth = context.measureText(text).width;
+        let textX = boardWidth/2 - textWidth/2;
+        let textY = 250 + i*50;
+        if (i === 0) {
+            context.fillStyle = "gold";
+        } else if (i === 1) {
+            context.fillStyle = "blue";
+        } else if (i === 2) {
+            context.fillStyle = "brown";
+        } else {
+            context.fillStyle = "white";
+        }
+        context.strokeText(text, textX, textY);
+        context.fillText(text, textX, textY);
+    }
+
+    //play again green button under the leaderboard
+    context.fillStyle = "green";
+    context.beginPath();
+    context.moveTo(boardWidth/2 - 200 + 20, 520);
+    context.lineTo(boardWidth/2 + 200 - 20, 520);
+    context.quadraticCurveTo(boardWidth/2 + 200, 520, boardWidth/2 + 200, 520 + 20);
+    context.lineTo(boardWidth/2 + 200, 580 - 20);
+    context.quadraticCurveTo(boardWidth/2 + 200, 580, boardWidth/2 + 200 - 20, 580);
+    context.lineTo(boardWidth/2 - 200 + 20, 580);
+    context.quadraticCurveTo(boardWidth/2 - 200, 580, boardWidth/2 - 200, 580 - 20);
+    context.lineTo(boardWidth/2 - 200, 520 + 20);
+    context.quadraticCurveTo(boardWidth/2 - 200, 520, boardWidth/2 - 200 + 20, 520);
+    context.closePath();
+    context.fill();
+
+    context.fillStyle = "white";
+    context.font="30px Impact";
+    context.lineWidth = 3;
+    context.strokeStyle = "black";
+    let text = "Play Again";
+    let textWidth = context.measureText(text).width;
+    let textX = boardWidth/2 - textWidth/2;
+    let textY = 560;
+    context.strokeText(text, textX, textY);
+    context.fillText(text, textX, textY);
+
+    //when user clicks this button -> reset the game
+    board.addEventListener("mousemove", function(event) {
+        let x = event.clientX - board.getBoundingClientRect().left;
+        let y = event.clientY - board.getBoundingClientRect().top;
+        if (x >= boardWidth/2 - 200 + 20 && x <= boardWidth/2 + 200 - 20 && y >= 520 && y <= 580) {
+            board.style.cursor = "pointer";
+        } else {
+            board.style.cursor = "default";
+        }
+    });
+
+    board.addEventListener("click", function(event) {
+        let x = event.clientX - board.getBoundingClientRect().left;
+        let y = event.clientY - board.getBoundingClientRect().top;
+        if (x >= boardWidth/2 - 200 + 20 && x <= boardWidth/2 + 200 - 20 && y >= 520 && y <= 580) {
+            gameOver = false;
+            canFly = false;
+            inIdleState = true;
+            bird.y = birdY;
+            score = 0;
+            velocityX = -5;
+            velocityY = 0;
+            gravity = 0.5;
+            pipeTimes = 2000;
+            pipeArray = [];
+        }
+    });
+
+    console.log(leaderboard);
+}
+
+//reset leaderboard for debugging
+document.addEventListener('keydown', function(event) {
+    console.log(localStorage.getItem("leaderboard"));
+    if (event.key === 'r') {
+        localStorage.removeItem("leaderboard");
+    }
+});
 
 function detectCollision(a, b) {
     return a.x < b.x + b.width &&   //a's top left corner doesn't reach b's top right corner

@@ -11,4 +11,3 @@ Create Flappy Bird Game
     3. i.e. if u need the last score, just create a last score method in ur file and return rng numbers until the person responsible for method finishes
    
 # Thank you
-
