@@ -43,6 +43,11 @@ let score = 0;
 //name
 let name = "!@#"
 
+//pipe images
+let pipeImgArray = [["Assets/toppipe.png", "Assets/bottompipe.png"], ["Assets/topnyit.png", "Assets/bottomnyit.png"], ["Assets/topsol.png", "Assets/bottomsol.png"]];
+//random number from 0 to 3
+let srcPicForPipeNum = 0;
+
 window.onload = function() {
     board = document.getElementById("board");
     board.height = boardHeight;
@@ -61,10 +66,10 @@ window.onload = function() {
     }
 
     topPipeImg = new Image();
-    topPipeImg.src = "Assets/toppipe.png";
-
     bottomPipeImg = new Image();
-    bottomPipeImg.src = "Assets/bottompipe.png";
+    
+    // topPipeImg.src = "Assets/toppipe.png";
+    // bottomPipeImg.src = "Assets/bottompipe.png";
 
     requestAnimationFrame(update);
     setInterval(placePipes, pipeTimes); //every 1.5 seconds
@@ -149,6 +154,16 @@ function update() {
         context.fillText("GAME OVER", boardWidth/2 - 112.5, 100);
         showLeaderboard();
     }
+
+    if (score % 10 == 0 && score != 0) {
+        // srcPicForPipeNum = Math.floor(Math.random() * (pipeImgArray.length));
+        if(srcPicForPipeNum >= pipeImgArray.length - 1) {
+            srcPicForPipeNum = 0;
+        }
+        else {
+            srcPicForPipeNum++;
+        }
+    }
     
 }
 
@@ -157,6 +172,9 @@ function placePipes() {
         pipeArray = [];
         return;
     }
+
+    topPipeImg.src = pipeImgArray[srcPicForPipeNum][0];
+    bottomPipeImg.src = pipeImgArray[srcPicForPipeNum][1];
 
     //(0-1) * pipeHeight/2.
     // 0 -> -128 (pipeHeight/4)
