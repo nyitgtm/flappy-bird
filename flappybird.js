@@ -1,18 +1,18 @@
-//board
+//GLOBAL Variables
+//board variables
 let board;
 let boardWidth = window.innerWidth;
 let boardHeight = window.innerHeight;
 let context;
 
-//bird
-let birdWidth = 34; //width/height ratio = 408/228 = 17/12
+//bird variables
+let birdWidth = 34; 
 let birdHeight = 24;
 let birdX = boardWidth/7;
 let birdY = boardHeight/2;
 let birdImg;
 let canFly = false;
 let inIdleState = true;
-
 let bird = {
     x : birdX,
     y : birdY,
@@ -20,43 +20,37 @@ let bird = {
     height : birdHeight
 }
 
-
-//pipes
+//pipes variables
 let pipeArray = [];
-let pipeWidth = 64; //width/height ratio = 384/3072 = 1/8
+let pipeWidth = 64; 
 let pipeHeight = boardHeight;
 let pipeX = boardWidth;
 let pipeY = 0;
-let pipeTimes = 1000; //every 2 seconds
-
+let pipeTimes = 1000; 
 let topPipeImg;
 let bottomPipeImg;
+let pipeImgArray = [["Assets/toppipe.png", "Assets/bottompipe.png"], ["Assets/topnyit.png", "Assets/bottomnyit.png"], ["Assets/topsol.png", "Assets/bottomsol.png"]];
+let srcPicForPipeNum = 0;
 
 //physics
 let velocityX = -5; //pipes moving left speed
 let velocityY = 0; //bird jump speed
 let gravity = 0.5;
 
+//game variables
 let gameOver = false;
 let score = 0;
-
-//name
 let name = "!@#"
 
-//pipe images
-let pipeImgArray = [["Assets/toppipe.png", "Assets/bottompipe.png"], ["Assets/topnyit.png", "Assets/bottomnyit.png"], ["Assets/topsol.png", "Assets/bottomsol.png"]];
-//random number from 0 to 3
-let srcPicForPipeNum = 0;
+
+//FUNCTIONS
 
 window.onload = function() {
+    //create canvas
     board = document.getElementById("board");
     board.height = boardHeight;
     board.width = boardWidth;
-    context = board.getContext("2d"); //used for drawing on the board
-
-    //draw flappy bird
-    // context.fillStyle = "green";
-    // context.fillRect(bird.x, bird.y, bird.width, bird.height);
+    context = board.getContext("2d"); 
 
     //load images
     birdImg = new Image();
@@ -64,48 +58,51 @@ window.onload = function() {
     birdImg.onload = function() {
         context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
     }
-
     topPipeImg = new Image();
     bottomPipeImg = new Image();
-    
-    // topPipeImg.src = "Assets/toppipe.png";
-    // bottomPipeImg.src = "Assets/bottompipe.png";
 
-    requestAnimationFrame(update);
-    setInterval(placePipes, pipeTimes); //every 1.5 seconds
-    document.addEventListener("keydown", moveBird);
+    requestAnimationFrame(update); //game loop
+    setInterval(placePipes, pipeTimes);  //place pipes every 1 second
+    document.addEventListener("keydown", moveBird); //move bird on key press
 }
 
+//game loop
 function update() {
+    //call update function again for each frame
     requestAnimationFrame(update);
+
+    //clear canvas if game is over
     if (gameOver) {
         return;
     }
     context.clearRect(0, 0, board.width, board.height);
 
-    //bird
-    velocityY += gravity;
-    // bird.y += velocityY;
+    //bird logic
+    velocityY += gravity; //apply gravity to velocityY
     bird.y = Math.max(bird.y + velocityY, 0); //apply gravity to current bird.y, limit the bird.y to top of the canvas
-    context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+    context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height); //draw bird
 
-    //pipes
+    //If the game is playing
     if(canFly) {
+        //pipe logic
         for (let i = 0; i < pipeArray.length; i++) {
             let pipe = pipeArray[i];
             pipe.x += velocityX;
             context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
-
+            
+            //if bird passes the pipe, increase score
             if (!pipe.passed && bird.x > pipe.x + pipe.width) {
                 score += 0.5; //0.5 because there are 2 pipes! so 0.5*2 = 1, 1 for each set of pipes
                 pipe.passed = true;
             }
 
+            //if bird hits the pipe, game over
             if (detectCollision(bird, pipe)) {
                 gameOver = true;
                 canFly = false;
             }
 
+            //if bird passes the pipe, increase the speed depending on the score
             if(score == 10) {
                 velocityX = -6;
             }
@@ -129,34 +126,35 @@ function update() {
         }
     }
 
-    //clear pipes
+    //clear pipes after they pass the screen
     while (pipeArray.length > 0 && pipeArray[0].x < -pipeWidth) {
         pipeArray.shift(); //removes first element from the array
     }
 
+    //draw score
     if(!inIdleState) {
-        //score
-        context.fillStyle = "white";
-        context.font="50px Impact";
-        context.lineWidth = 3;
-        context.strokeStyle = "black";
-        context.strokeText(score, boardWidth/2 - 25, 45);
-        context.fillText(score, boardWidth/2 - 25, 45);
+        context.fillStyle = "white"; // Set the fill style to white
+        context.font = "50px Impact"; // Set the font to 50px Impact
+        context.lineWidth = 3; // Set the line width to 3
+        context.strokeStyle = "black"; // Set the stroke style to black
+        context.strokeText(score, boardWidth/2 - 25, 45); // Draw the score as a stroked text on the canvas
+        context.fillText(score, boardWidth/2 - 25, 45); // Draw the score as a filled text on the canvas
     }
     else {
-        idleStateSim();
+        idleStateSim(); //simulate idle state
     }
 
+    //display gameover and leaderboard
     if (gameOver) {
         context.lineWidth = 4; // increase the outline width
-        context.strokeStyle = "black";
-        context.strokeText("GAME OVER", boardWidth/2 - 112.5, 100);
-        context.fillText("GAME OVER", boardWidth/2 - 112.5, 100);
-        showLeaderboard();
+        context.strokeStyle = "black"; // Set the stroke style to black
+        context.strokeText("GAME OVER", boardWidth/2 - 112.5, 100); // Draw the game over text as a stroked text on the canvas
+        context.fillText("GAME OVER", boardWidth/2 - 112.5, 100); // Draw the game over text as a filled text on the canvas
+        showLeaderboard(); //show leaderboard
     }
 
+    //change pipe image every 10 points for aesthetic purposes
     if (score % 10 == 0 && score != 0) {
-        // srcPicForPipeNum = Math.floor(Math.random() * (pipeImgArray.length));
         if(srcPicForPipeNum >= pipeImgArray.length - 1) {
             srcPicForPipeNum = 0;
         }
@@ -164,24 +162,23 @@ function update() {
             srcPicForPipeNum++;
         }
     }
-    
 }
 
+//place pipes on the screen
 function placePipes() {
+    //clear pipes if gameover, can't fly or in idle state
     if (gameOver || !canFly || inIdleState) {
         pipeArray = [];
         return;
     }
 
+    //update paths for src files
     topPipeImg.src = pipeImgArray[srcPicForPipeNum][0];
     bottomPipeImg.src = pipeImgArray[srcPicForPipeNum][1];
 
-    //(0-1) * pipeHeight/2.
-    // 0 -> -128 (pipeHeight/4)
-    // 1 -> -128 - 256 (pipeHeight/4 - pipeHeight/2) = -3/4 pipeHeight
+    //randomize the pipe height
     let randomPipeY = pipeY - pipeHeight/4 - Math.random()*(pipeHeight/2);
     let openingSpace = board.height/4;
-
     let topPipe = {
         img : topPipeImg,
         x : pipeX,
@@ -190,8 +187,7 @@ function placePipes() {
         height : pipeHeight,
         passed : false
     }
-    pipeArray.push(topPipe);
-
+    pipeArray.push(topPipe); //add top pipe to the array
     let bottomPipe = {
         img : bottomPipeImg,
         x : pipeX,
@@ -200,12 +196,12 @@ function placePipes() {
         height : pipeHeight,
         passed : false
     }
-    pipeArray.push(bottomPipe);
+    pipeArray.push(bottomPipe); //add bottom pipe to the array
 }
 
+//move bird on key press
 function moveBird(e) {
-    if (e.code == "Space" || e.code == "ArrowUp" || e.code == "KeyX") {
-        //jump
+    if (e.code == "Space") {
         velocityY = -10;
 
         //reset game
@@ -216,8 +212,6 @@ function moveBird(e) {
             velocityY = 0;
             gravity = 0.5;
             pipeTimes = 2000;
-            //gameOver = false;
-            //inIdleState = true;
         }
         else {
             canFly = true;
@@ -226,14 +220,15 @@ function moveBird(e) {
     }
 }
 
+//simulate idle state
 function idleStateSim() {
-    //make the bird hover
     inIdleState = true;
     let random = 1 + Math.random()*1.5;
     if (bird.y >= boardHeight/random) {
         velocityY = -10;
     }
 
+    //draw press space to start text
     context.fillStyle = "white";
     context.font="50px Impact";
     context.lineWidth = 5;
@@ -244,9 +239,13 @@ function idleStateSim() {
     context.globalAlpha = 1; // reset opacity
 }
 
+//show leaderboard
 function showLeaderboard() {
+    //check if user has entered a name and stored it in local storage
     if(name == "!@#") {
         name = prompt("Enter your name: ").trim();
+
+        //filtering the names
         if(name == null) {
             name = "Anonymous";
         }
@@ -258,6 +257,7 @@ function showLeaderboard() {
         }
     }
 
+    //store the score and name in local storage
     let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
     leaderboard.push({name: name.substring(0, 24), score: score});
     leaderboard.sort((a, b) => b.score - a.score); //sort in descending order
@@ -281,19 +281,22 @@ function showLeaderboard() {
     context.fill();
     context.globalAlpha = 1; 
 
+    //writing names and scores on the leaderboard
     context.fillStyle = "white";
     context.font="30px Impact";
     context.lineWidth = 3;
     context.strokeStyle = "black";
     context.strokeText("Leaderboard", boardWidth/2 - 80, 200);
     context.fillText("Leaderboard", boardWidth/2 - 80, 200);
+    //display the top 5 scores
     for (let i = 0; i < leaderboard.length; i++) {
-        let name = leaderboard[i].name;
+        let name = leaderboard[i].name; 
         let score = leaderboard[i].score;
         let text = name + " : " + score;
         let textWidth = context.measureText(text).width;
         let textX = boardWidth/2 - textWidth/2;
         let textY = 250 + i*50;
+        //filtering top 3 scores to accordingly colors
         if (i === 0) {
             context.fillStyle = "gold";
         } else if (i === 1) {
@@ -321,7 +324,6 @@ function showLeaderboard() {
     context.quadraticCurveTo(boardWidth/2 - 200, 520, boardWidth/2 - 200 + 20, 520);
     context.closePath();
     context.fill();
-
     context.fillStyle = "white";
     context.font="30px Impact";
     context.lineWidth = 3;
@@ -332,6 +334,7 @@ function showLeaderboard() {
     let textY = 560;
     context.strokeText(text, textX, textY);
     context.fillText(text, textX, textY);
+
 
     //when user clicks this button -> reset the game
     board.addEventListener("mousemove", function(event) {
@@ -344,10 +347,11 @@ function showLeaderboard() {
         }
     });
 
+    //code behind reseting the game
     board.addEventListener("click", function(event) {
         let x = event.clientX - board.getBoundingClientRect().left;
         let y = event.clientY - board.getBoundingClientRect().top;
-        if (x >= boardWidth/2 - 200 + 20 && x <= boardWidth/2 + 200 - 20 && y >= 520 && y <= 580) {
+        if (x >= boardWidth/2 - 200 + 20 && x <= boardWidth/2 + 200 - 20 && y >= 520 && y <= 580 && gameOver) {
             gameOver = false;
             canFly = false;
             inIdleState = true;
@@ -360,8 +364,6 @@ function showLeaderboard() {
             pipeArray = [];
         }
     });
-
-    console.log(leaderboard);
 }
 
 //reset leaderboard for debugging
