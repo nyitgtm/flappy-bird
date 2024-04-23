@@ -1,13 +1,13 @@
-# flappy-bird
-Create Flappy Bird Game
+# Flappy Bird
+<img src="public/Assets/moving-bird.gif" width=70% />
 
-# NOTE TO DEVELOPERS
-- **ONLY LET NAV MERGE OR PUSH TO MAIN!!!!!!!**
-- **DO NOT PUSH TO THE MAIN ORIGIN BRANCH!!!!!!!**
-- Create features in branches (https://www.youtube.com/watch?v=QV0kVNvkMxc)
-- - if u need features from other developer's files either:
-  - 1. ask them to implement + merge to main
-    2. *(recommended)* create "fake method" to simulate results until they finish
-    3. i.e. if u need the last score, just create a last score method in ur file and return rng numbers until the person responsible for method finishes
-   
-# Thank you
+<img src="https://educationusa.state.gov/sites/default/files/styles/content_area_full_width/public/field_hei_logo/nyit-logo-pms.jpg?itok=6yOYbJdd" width="35px" />
+
+[Live Demo](https://flappy-bird-irt4.onrender.com/)
+
+Project created for CSCI 318 depicting Flappy Bird NFA/DFA/PDA
+
+SQL Query 
+INSERT INTO flappy_scores (NAME, SCORE) VALUES ('nav', 999);
+
+SELECT * FROM flappy_scores;

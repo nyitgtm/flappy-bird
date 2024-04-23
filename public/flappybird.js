@@ -246,8 +246,8 @@ function idleStateSim() {
     context.globalAlpha = 1; // reset opacity
 }
 
+// Get the highest scores from the server
 function showLeaderboard() {
-    // Get the highest scores from the server
     if(name == "!@#") {
         name = prompt("Enter your name: ").trim();
 
@@ -263,10 +263,12 @@ function showLeaderboard() {
         }
     }
 
+    //fetching the scores from the server
     fetch('/getHighestScores')
         .then(response => response.json())
         .then(data => {
             leaderboard = data;
+            //if the score is higher than the lowest score in the leaderboard or the leaderboard is not full
             if(score > leaderboard[leaderboard.length - 1].score || leaderboard.length < 5) {
                 fetch('/sendScore', {
                     method: 'POST',
