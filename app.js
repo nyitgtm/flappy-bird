@@ -11,10 +11,20 @@ const pool = new Pool({
 
 app.use(express.static('public'));
 
-async function getHighestScoresServer() {
-    const res = await pool.query('SELECT *  FROM flappy_scores ORDER BY SCORE DESC LIMIT 5;');
+async function getScoresServer() {
+    const res = await pool.query('SELECT * FROM flappy_scores;');
     return res.rows;
-  }
+ }
+
+app.get('/getScores', async (req, res) => {
+    const scores = await getScoresServer();
+    res.json(scores);
+});
+
+async function getHighestScoresServer() {
+  const res = await pool.query('SELECT *  FROM flappy_scores ORDER BY SCORE DESC LIMIT 5;');
+  return res.rows;
+}
 
 app.get('/getHighestScores', async (req, res) => {
     const leaderboard = await getHighestScoresServer();
@@ -36,6 +46,8 @@ app.post('/sendScore', async (req, res) => {
     res.status(500).json({ message: 'Failed to send score' });
   }
 });
+
+
 
 app.get('/', (req, res) => {
     res.send('Hello, world!');
