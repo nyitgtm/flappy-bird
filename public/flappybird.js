@@ -214,7 +214,6 @@ function moveBird(e) {
         //reset game
         if (gameOver) {
             bird.y = birdY;
-            score = 0;
             velocityX = -5;
             velocityY = 0;
             gravity = 0.5;
@@ -244,6 +243,8 @@ function idleStateSim() {
     context.strokeText("Press Space to Start", boardWidth/2 - 210, 100);
     context.fillText("Press Space to Start", boardWidth/2 - 210, 100);
     context.globalAlpha = 1; // reset opacity
+
+    score = 0; //reset score
 }
 
 // Get the highest scores from the server
@@ -404,7 +405,6 @@ function showLeaderboardHelper(leaderboard) {
             canFly = false;
             inIdleState = true;
             bird.y = birdY;
-            score = 0;
             velocityX = -5;
             velocityY = 0;
             gravity = 0.5;
