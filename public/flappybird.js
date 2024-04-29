@@ -286,7 +286,7 @@ function showLeaderboard() {
                 leaderboard = leaderboard.slice(0, 5);
             }
             leaderboard.sort((a, b) => b.score - a.score);
-            leaderboard = leaderboard.slice(0, 6);
+            leaderboard = leaderboard.slice(0, 5);
             showLeaderboardHelper(leaderboard);
 
         })
