@@ -271,18 +271,18 @@ function showLeaderboard() {
                 //add to the leaderboard so we dont have to make another request
                 leaderboard.push({name: name, score: score});
                 leaderboard.sort((a, b) => b.score - a.score);
-                leaderboard = leaderboard.slice(0, 5);
+                // leaderboard = leaderboard.slice(0, 5);
             //}
 
             //Delete extra scores so server doesn't get overloaded
-            if(leaderboard.length >= 6) {
-                console.log(leaderboard[leaderboard.length].score);
+            if(leaderboard.length >= 5) {
+                console.log("Deleting score from server");
                 fetch('/deleteScores', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ score: leaderboard[leaderboard.length].score })
+                    body: JSON.stringify({ score: leaderboard[4].score })
                 })
                 .catch(error => {
                     console.error('Error deleting scores:', error);

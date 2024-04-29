@@ -49,12 +49,12 @@ app.post('/sendScore', async (req, res) => {
 
 //DELETING SCORES BACKEND
 async function deleteScoresServer(score) {
-  const res = await pool.query('DELETE FROM flappy_scores where score<' + score + ';');
-  return res.rowCount;
+  await pool.query('DELETE FROM flappy_scores where score<' + score + ';');
+  console.log(score);
 }
 app.post('/deleteScores', async (req, res) => {
   const { score } = req.body;
-  const rowCount = await deleteScoresServer(score);
+  await deleteScoresServer(score);
 });
 
 //default route
