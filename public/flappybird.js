@@ -239,13 +239,13 @@ function showLeaderboard() {
 
         //filtering the names
         if(name == null) {
-            name = "Anonymous";
+            name = "Anon";
         }
         else if (name.length == 0) {
-            name = "Anonymous";
+            name = "Anon";
         }
-        else if (name.length > 24) {
-            name = name.substring(0, 19) + " ...";
+        else if (name.length > 10) {
+            name = name.substring(0, 7) + " ...";
         }
     }
 
@@ -255,7 +255,7 @@ function showLeaderboard() {
         .then(data => {
             leaderboard = data;
             //Delete extra scores so server doesn't get overloaded
-            if(leaderboard.length >= 10) {
+            if(leaderboard.length >= 6) {
                 console.log(leaderboard[leaderboard.length - 1].score);
                 fetch('/deleteScores', {
                     method: 'POST',
