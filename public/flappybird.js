@@ -32,7 +32,6 @@ let pipeY = 0;
 let pipeTimes = 1000; 
 let topPipeImg;
 let bottomPipeImg;
-let pipeImgArray = [["Assets/toppipe.png", "Assets/bottompipe.png"], ["Assets/topnyit.png", "Assets/bottomnyit.png"], ["Assets/topsol.png", "Assets/bottomsol.png"]];
 let srcPicForPipeNum = 0;
 
 //physics
@@ -46,7 +45,6 @@ let score = 0;
 let name = "!@#"
 let previousScore = 0;
 let localLeaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
-
 
 
 //FUNCTIONS
@@ -66,6 +64,8 @@ window.onload = function() {
     }
     topPipeImg = new Image();
     bottomPipeImg = new Image();
+    topPipeImg.src = "Assets/toppipe.png";
+    bottomPipeImg.src = "Assets/bottompipe.png";
 
     requestAnimationFrame(update); //game loop
     setInterval(placePipes, pipeTimes);  //place pipes every 1 second
@@ -158,17 +158,6 @@ function update() {
         context.fillText("GAME OVER", boardWidth/2 - 112.5, 100); // Draw the game over text as a filled text on the canvas
         showLeaderboard(); //show leaderboard
     }
-
-    //change pipe image every 10 points for aesthetic purposes
-    if (score % 10 == 0 && score != 0 && previousScore != score) {
-        previousScore = score;
-        if(srcPicForPipeNum >= pipeImgArray.length - 1) {
-            srcPicForPipeNum = 0;
-        }
-        else {
-            srcPicForPipeNum++;
-        }
-    }
 }
 
 //place pipes on the screen
@@ -178,10 +167,6 @@ function placePipes() {
         pipeArray = [];
         return;
     }
-
-    //update paths for src files
-    topPipeImg.src = pipeImgArray[srcPicForPipeNum][0];
-    bottomPipeImg.src = pipeImgArray[srcPicForPipeNum][1];
 
     //randomize the pipe height
     let randomPipeY = pipeY - pipeHeight/4 - Math.random()*(pipeHeight/2);
@@ -265,10 +250,24 @@ function showLeaderboard() {
     }
 
     //fetching the scores from the server
-    fetch('/getHighestScores')
+    fetch('/getScores')
         .then(response => response.json())
         .then(data => {
             leaderboard = data;
+            //Delete extra scores so server doesn't get overloaded
+            if(leaderboard.length >= 10) {
+                fetch('/deleteScores', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ score: leaderboard[leaderboard.length - 1].score })
+                })
+                .catch(error => {
+                    console.error('Error deleting scores:', error);
+                });
+            }
+
             //if the score is higher than the lowest score in the leaderboard or the leaderboard is not full
             if(score > leaderboard[leaderboard.length - 1].score || leaderboard.length < 5) {
                 fetch('/sendScore', {
@@ -286,11 +285,13 @@ function showLeaderboard() {
                 leaderboard.sort((a, b) => b.score - a.score);
                 leaderboard = leaderboard.slice(0, 5);
             }
+            leaderboard.sort((a, b) => b.score - a.score);
+            leaderboard = leaderboard.slice(0, 6);
             showLeaderboardHelper(leaderboard);
 
         })
         .catch(error => {
-            console.log("Error retriivng scores: ", error);
+            console.log("Error retriving scores: ", error);
 
             //Draw message on bottom of the screen that the server is down
             context.fillStyle = "white";

@@ -47,6 +47,16 @@ app.post('/sendScore', async (req, res) => {
   }
 });
 
+//DELETING SCORES BACKEND
+async function deleteScoresServer(score) {
+  const res = await pool.query('DELETE FROM flappy_scores where score<' + score + ';');
+  return res.rowCount;
+}
+app.post('/deleteScores', async (req, res) => {
+  const { score } = req.body;
+  const rowCount = await deleteScoresServer(score);
+});
+
 //default route
 app.get('/', (req, res) => {
     res.send('Hello, world!');
