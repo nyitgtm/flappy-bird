@@ -254,23 +254,10 @@ function showLeaderboard() {
         .then(response => response.json())
         .then(data => {
             leaderboard = data;
-            //Delete extra scores so server doesn't get overloaded
-            if(leaderboard.length >= 6) {
-                console.log(leaderboard[leaderboard.length - 1].score);
-                fetch('/deleteScores', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ score: leaderboard[9].score })
-                })
-                .catch(error => {
-                    console.error('Error deleting scores:', error);
-                });
-            }
 
             //if the score is higher than the lowest score in the leaderboard or the leaderboard is not full
-            if(score > leaderboard[leaderboard.length - 1].score || leaderboard.length < 5) {
+            //if(score > lowestScore || leaderboard.length < 5) {
+                console.log("Sending score to server" + score);
                 fetch('/sendScore', {
                     method: 'POST',
                     headers: {
@@ -285,7 +272,23 @@ function showLeaderboard() {
                 leaderboard.push({name: name, score: score});
                 leaderboard.sort((a, b) => b.score - a.score);
                 leaderboard = leaderboard.slice(0, 5);
+            //}
+
+            //Delete extra scores so server doesn't get overloaded
+            if(leaderboard.length >= 6) {
+                console.log(leaderboard[leaderboard.length].score);
+                fetch('/deleteScores', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ score: leaderboard[leaderboard.length].score })
+                })
+                .catch(error => {
+                    console.error('Error deleting scores:', error);
+                });
             }
+
             leaderboard.sort((a, b) => b.score - a.score);
             leaderboard = leaderboard.slice(0, 5);
             showLeaderboardHelper(leaderboard);
