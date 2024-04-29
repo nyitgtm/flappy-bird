@@ -256,12 +256,13 @@ function showLeaderboard() {
             leaderboard = data;
             //Delete extra scores so server doesn't get overloaded
             if(leaderboard.length >= 10) {
+                console.log(leaderboard[leaderboard.length - 1].score);
                 fetch('/deleteScores', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ score: leaderboard[leaderboard.length - 1].score })
+                    body: JSON.stringify({ score: leaderboard[9].score })
                 })
                 .catch(error => {
                     console.error('Error deleting scores:', error);
